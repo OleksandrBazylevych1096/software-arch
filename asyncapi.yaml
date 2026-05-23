@@ -1,0 +1,419 @@
+asyncapi: 2.6.0
+
+info:
+  title: Inventory and Financial Analytics Events API
+  version: 1.0.0
+  description: AsyncAPI specification for inventory events and financial analytics event processing.
+
+servers:
+  production:
+    url: broker.example.com
+    protocol: kafka
+    description: Production message broker
+
+  local:
+    url: localhost:9092
+    protocol: kafka
+    description: Local Kafka broker
+
+channels:
+  inventory.item.created:
+    description: Event published when a new inventory item is created.
+    publish:
+      summary: Inventory item created
+      operationId: publishInventoryItemCreated
+      message:
+        $ref: "#/components/messages/InventoryItemCreated"
+
+  inventory.item.updated:
+    description: Event published when an inventory item is updated.
+    publish:
+      summary: Inventory item updated
+      operationId: publishInventoryItemUpdated
+      message:
+        $ref: "#/components/messages/InventoryItemUpdated"
+
+  inventory.item.deleted:
+    description: Event published when an inventory item is deleted.
+    publish:
+      summary: Inventory item deleted
+      operationId: publishInventoryItemDeleted
+      message:
+        $ref: "#/components/messages/InventoryItemDeleted"
+
+  inventory.stock.updated:
+    description: Event published when item stock quantity is changed.
+    publish:
+      summary: Inventory stock updated
+      operationId: publishInventoryStockUpdated
+      message:
+        $ref: "#/components/messages/InventoryStockUpdated"
+
+  financial.transaction.created:
+    description: Event published when a financial transaction is created.
+    publish:
+      summary: Financial transaction created
+      operationId: publishFinancialTransactionCreated
+      message:
+        $ref: "#/components/messages/FinancialTransactionCreated"
+
+  financial.analytics.calculated:
+    description: Event published when financial analytics data is calculated.
+    publish:
+      summary: Financial analytics calculated
+      operationId: publishFinancialAnalyticsCalculated
+      message:
+        $ref: "#/components/messages/FinancialAnalyticsCalculated"
+
+  financial.report.generated:
+    description: Event published when a financial report is generated.
+    publish:
+      summary: Financial report generated
+      operationId: publishFinancialReportGenerated
+      message:
+        $ref: "#/components/messages/FinancialReportGenerated"
+
+components:
+  messages:
+    InventoryItemCreated:
+      name: InventoryItemCreated
+      title: Inventory Item Created
+      summary: Message sent when a new inventory item is created.
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/InventoryItemCreatedPayload"
+
+    InventoryItemUpdated:
+      name: InventoryItemUpdated
+      title: Inventory Item Updated
+      summary: Message sent when an inventory item is updated.
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/InventoryItemUpdatedPayload"
+
+    InventoryItemDeleted:
+      name: InventoryItemDeleted
+      title: Inventory Item Deleted
+      summary: Message sent when an inventory item is deleted.
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/InventoryItemDeletedPayload"
+
+    InventoryStockUpdated:
+      name: InventoryStockUpdated
+      title: Inventory Stock Updated
+      summary: Message sent when item stock quantity changes.
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/InventoryStockUpdatedPayload"
+
+    FinancialTransactionCreated:
+      name: FinancialTransactionCreated
+      title: Financial Transaction Created
+      summary: Message sent when a new financial transaction is created.
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/FinancialTransactionCreatedPayload"
+
+    FinancialAnalyticsCalculated:
+      name: FinancialAnalyticsCalculated
+      title: Financial Analytics Calculated
+      summary: Message sent when financial analytics are recalculated.
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/FinancialAnalyticsCalculatedPayload"
+
+    FinancialReportGenerated:
+      name: FinancialReportGenerated
+      title: Financial Report Generated
+      summary: Message sent when a financial report is generated.
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/FinancialReportGeneratedPayload"
+
+  schemas:
+    InventoryItem:
+      type: object
+      required:
+        - id
+        - name
+        - sku
+        - category
+        - price
+        - quantity
+        - status
+      properties:
+        id:
+          type: string
+          example: item_123
+        name:
+          type: string
+          example: Laptop
+        sku:
+          type: string
+          example: LAP-001
+        category:
+          type: string
+          example: Electronics
+        price:
+          type: number
+          format: float
+          example: 1200.5
+        quantity:
+          type: integer
+          example: 25
+        status:
+          type: string
+          enum:
+            - in_stock
+            - low_stock
+            - out_of_stock
+          example: in_stock
+
+    InventoryItemCreatedPayload:
+      type: object
+      required:
+        - eventId
+        - eventType
+        - occurredAt
+        - data
+      properties:
+        eventId:
+          type: string
+          example: evt_001
+        eventType:
+          type: string
+          example: inventory.item.created
+        occurredAt:
+          type: string
+          format: date-time
+          example: "2026-05-23T10:00:00Z"
+        data:
+          $ref: "#/components/schemas/InventoryItem"
+
+    InventoryItemUpdatedPayload:
+      type: object
+      required:
+        - eventId
+        - eventType
+        - occurredAt
+        - data
+      properties:
+        eventId:
+          type: string
+          example: evt_002
+        eventType:
+          type: string
+          example: inventory.item.updated
+        occurredAt:
+          type: string
+          format: date-time
+          example: "2026-05-23T11:00:00Z"
+        data:
+          $ref: "#/components/schemas/InventoryItem"
+
+    InventoryItemDeletedPayload:
+      type: object
+      required:
+        - eventId
+        - eventType
+        - occurredAt
+        - data
+      properties:
+        eventId:
+          type: string
+          example: evt_003
+        eventType:
+          type: string
+          example: inventory.item.deleted
+        occurredAt:
+          type: string
+          format: date-time
+          example: "2026-05-23T12:00:00Z"
+        data:
+          type: object
+          required:
+            - id
+          properties:
+            id:
+              type: string
+              example: item_123
+
+    InventoryStockUpdatedPayload:
+      type: object
+      required:
+        - eventId
+        - eventType
+        - occurredAt
+        - data
+      properties:
+        eventId:
+          type: string
+          example: evt_004
+        eventType:
+          type: string
+          example: inventory.stock.updated
+        occurredAt:
+          type: string
+          format: date-time
+          example: "2026-05-23T13:00:00Z"
+        data:
+          type: object
+          required:
+            - itemId
+            - oldQuantity
+            - newQuantity
+          properties:
+            itemId:
+              type: string
+              example: item_123
+            oldQuantity:
+              type: integer
+              example: 25
+            newQuantity:
+              type: integer
+              example: 40
+            reason:
+              type: string
+              example: New stock received
+
+    FinancialTransactionCreatedPayload:
+      type: object
+      required:
+        - eventId
+        - eventType
+        - occurredAt
+        - data
+      properties:
+        eventId:
+          type: string
+          example: evt_005
+        eventType:
+          type: string
+          example: financial.transaction.created
+        occurredAt:
+          type: string
+          format: date-time
+          example: "2026-05-23T14:00:00Z"
+        data:
+          type: object
+          required:
+            - transactionId
+            - type
+            - amount
+            - currency
+          properties:
+            transactionId:
+              type: string
+              example: trx_123
+            type:
+              type: string
+              enum:
+                - revenue
+                - expense
+              example: revenue
+            amount:
+              type: number
+              format: float
+              example: 2500.75
+            currency:
+              type: string
+              example: USD
+            relatedOrderId:
+              type: string
+              example: order_123
+
+    FinancialAnalyticsCalculatedPayload:
+      type: object
+      required:
+        - eventId
+        - eventType
+        - occurredAt
+        - data
+      properties:
+        eventId:
+          type: string
+          example: evt_006
+        eventType:
+          type: string
+          example: financial.analytics.calculated
+        occurredAt:
+          type: string
+          format: date-time
+          example: "2026-05-23T15:00:00Z"
+        data:
+          type: object
+          required:
+            - period
+            - totalRevenue
+            - totalExpenses
+            - totalProfit
+          properties:
+            period:
+              type: object
+              properties:
+                from:
+                  type: string
+                  format: date
+                  example: "2026-05-01"
+                to:
+                  type: string
+                  format: date
+                  example: "2026-05-31"
+            totalRevenue:
+              type: number
+              format: float
+              example: 50000.75
+            totalExpenses:
+              type: number
+              format: float
+              example: 32000.25
+            totalProfit:
+              type: number
+              format: float
+              example: 18000.5
+            profitMargin:
+              type: number
+              format: float
+              example: 36.0
+
+    FinancialReportGeneratedPayload:
+      type: object
+      required:
+        - eventId
+        - eventType
+        - occurredAt
+        - data
+      properties:
+        eventId:
+          type: string
+          example: evt_007
+        eventType:
+          type: string
+          example: financial.report.generated
+        occurredAt:
+          type: string
+          format: date-time
+          example: "2026-05-23T16:00:00Z"
+        data:
+          type: object
+          required:
+            - reportId
+            - reportType
+            - fileUrl
+          properties:
+            reportId:
+              type: string
+              example: report_123
+            reportType:
+              type: string
+              enum:
+                - revenue
+                - profit
+                - expenses
+                - full_financial_report
+              example: full_financial_report
+            fileUrl:
+              type: string
+              format: uri
+              example: "https://cdn.example.com/reports/report_123.pdf"
